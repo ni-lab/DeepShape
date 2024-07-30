@@ -9,9 +9,9 @@ Each input is passed through two convolutional layers before being merged.
 """
 
 
-class DeeperDeepSEA(nn.Module):
+class DeepShape(nn.Module):
 	def __init__(self, sequence_length, n_targets):
-		super(DeeperDeepSEA, self).__init__()
+		super(DeepShape, self).__init__()
 		conv_kernel_size = 4
 		pool_kernel_size = 4
 
