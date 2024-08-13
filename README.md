@@ -6,3 +6,15 @@ DeepShape is a deep convolutional neural network designed to predict molecular p
 
 DeepShape is built upon DeeperDeepSEA, a PyTorch-based deep learning model originally designed to predict chromatin features from DNA sequence alone as implemented in [Selene](https://www.nature.com/articles/s41592-019-0360-8).
 
+## Setup
+
+The `environment.yaml` file provided in this repository contains the dependencies required to run DeepShape. 
+
+Create the new conda environment:
+```bash
+conda env create -f environment.yaml
+```
+Activation the conda environment:
+```bash
+conda activate dnashapeenv
+```
