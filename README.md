@@ -34,11 +34,11 @@ The `model` directory contains the DeepShape model implementation:
 
 - `deepshape.py`
 
-### Step 1: Prepare the Configuration File
+### Prepare the Configuration File
 
 Ensure your configuration file is prepared, including all necessary parameters and paths. An example is available in `config`.
 
-### Step 2: Run the DeepShape Model
+### Run the DeepShape Model
 
 To run the DeepShape model using the `run_deepshape.py` script, execute the following command in your terminal:
 
