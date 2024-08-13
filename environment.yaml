@@ -1,4 +1,4 @@
-name: /clusterfs/nilah/forest/envs/dnashapeenv
+name: dnashapeenv
 channels:
   - pytorch
   - nvidia
@@ -251,4 +251,3 @@ dependencies:
       - tqdm==4.66.1
       - xdg==6.0.0
       - xxhash==3.4.1
-prefix: /clusterfs/nilah/forest/envs/dnashapeenv
