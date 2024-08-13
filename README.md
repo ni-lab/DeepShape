@@ -18,3 +18,32 @@ Activate the conda environment:
 ```bash
 conda activate dnashapeenv
 ```
+
+Once the environment is activated, you will be ready to run DeepShape with all necessary dependencies installed.
+
+## Running DeepShape
+
+The utils directory holds essential scripts and helper files needed to run DeepShape. Ensure the following are present `in utils`:
+
+- `run_deepshape.py`: The main script to run DeepShape.
+- `shape_fasta.py`: A helper script for processing FASTA files.
+- `genome_shape_hdf5`: Directory containing helper scripts for processing genome shape data.
+- `intervals_sampler_hdf5`: Directory containing helper scripts for sampling.
+
+The `model` directory contains the DeepShape model implementation:
+
+- `deepshape.py`
+
+### Step 1: Prepare the Configuration File
+
+Ensure your configuration file is prepared, including all necessary parameters and paths. An example is available in `config`.
+
+### Step 2: Run the DeepShape Model
+
+To run the DeepShape model using the `run_deepshape.py` script, execute the following command in your terminal:
+
+```bash
+python utils/run_deepshape.py /ABSOLUTE/PATH/config/train_deepshape.yml
+```
+
+
