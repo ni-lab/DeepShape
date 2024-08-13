@@ -1,0 +1,45 @@
+---
+ops: [ train, evaluate ]
+model: {
+  path: /ABSOLUTE/PATH/model/deepshape.py,
+  class: DeepShape,
+  class_args: {
+    sequence_length: 1000,
+    n_targets: 919,
+  },
+}
+lr: 0.08
+sampler: !obj:intervals_sampler_hdf5.parallel_intervals_sampler.ParallelIntervalsSampler {
+  reference_sequence: !obj:genome_shape_hdf5.make_genomeshape.GenomeShapeMaker {
+    input_path: /ABSOLUTE/PATH/male.hg19.fasta,
+    blacklist_regions: hg19,
+    multi_feat_file: /ABSOLUTE/PATH/hg19/hg19.EP_HelT_MGW_ProT_Roll.hdf5,
+  },
+  features: !obj:selene_sdk.utils.load_features_list {
+    input_path: /ABSOLUTE/PATH/data/distinct_features.txt
+  },
+  target_path: /ABSOLUTE/PATH/sorted_deepsea_data.bed.gz,
+  intervals_path: /ABSOLUTE/PATH/data/TF_intervals.txt,
+  test_holdout: [ chr8, chr9 ],
+  validation_holdout: [ chr6, chr7 ],
+  seed: 127,
+  sequence_length: 1000,
+  center_bin_to_predict: 200,
+  feature_thresholds: 0.5,
+  mode: train,
+  save_datasets: [ train, test, validate ]
+}
+train_model: !obj:selene_sdk.TrainModel {
+  batch_size: 64,
+  max_steps: 960000,
+  report_stats_every_n_steps: 64000,
+  n_validation_samples: 16000,
+  n_test_samples: 640000,
+  use_cuda: True,
+  data_parallel: True,
+  logging_verbosity: 2,
+  save_checkpoint_every_n_steps: 8000
+}
+output_dir: /ABSOLUTE/PATH/OUTPUT
+random_seed: 1447
+create_subdirectory: False
