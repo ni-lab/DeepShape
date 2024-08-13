@@ -23,7 +23,7 @@ Once the environment is activated, you will be ready to run DeepShape with all n
 
 ## Running DeepShape
 
-The utils directory holds essential scripts and helper files needed to run DeepShape. Ensure the following are present in `utils`:
+The `utils` directory holds essential scripts and helper files needed to run DeepShape. Ensure the following are present in `utils`:
 
 - `run_deepshape.py`: The main script to run DeepShape.
 - `shape_fasta.py`: A helper script for processing FASTA files.
