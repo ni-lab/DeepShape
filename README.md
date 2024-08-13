@@ -14,7 +14,7 @@ Create the new conda environment:
 ```bash
 conda env create -f environment.yaml
 ```
-Activation the conda environment:
+Activate the conda environment:
 ```bash
 conda activate dnashapeenv
 ```
