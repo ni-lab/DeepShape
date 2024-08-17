@@ -214,6 +214,7 @@ dependencies:
       - feather-format==0.4.1
       - filelock==3.12.2
       - genomepy==0.16.1
+      - hdf5plugin==4.4.0
       - htseq==2.0.5
       - igraph==0.10.8
       - importlib-resources==5.12.0

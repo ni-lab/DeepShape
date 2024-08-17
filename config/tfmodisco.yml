@@ -1,0 +1,4 @@
+encodings: /ABSOLUTE/PATH/interpret/outputs/encodings.npz
+attributions: /ABSOLUTE/PATH/interpret/outputs/attributions.npz
+output_dir: /ABSOLUTE/PATH/interpret/outputs/modisco
+max_seqlets: 10000

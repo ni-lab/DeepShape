@@ -1,0 +1,19 @@
+model:
+  path: /ABSOLUTE/PATH/model/deepshape_no_normalize.py
+  class: DeepShape
+  kwargs:
+    n_targets: 919
+    sequence_length: 1000
+checkpoint: /path/to/checkpoint.pth.tar
+positive_data_bed: /ABSOLUTE/PATH/data/HepG2_MafK/positive_data.bed
+background_data_bed: /ABSOLUTE/PATH/data/HepG2_MafK/background_data.bed
+sequence:
+  path: /ABSOLUTE/PATH/utils/genome_shape_hdf5/genomeshape_normalize.py
+  class: GenomeShape
+  kwargs:
+    input_path: /path/to/male.hg19.fasta
+    multi_feat_file: /path/to/hg19.EP_HelT_MGW_ProT_Roll.hdf5
+seed: 1337
+n_background: 64
+target: 504
+output_dir: /ABSOLUTE/PATH/interpret/outputs
