@@ -34,7 +34,7 @@ train_model: !obj:selene_sdk.TrainModel {
   max_steps: 960000,
   report_stats_every_n_steps: 64000,
   n_validation_samples: 16000,
-  n_test_samples: 640000,
+  n_test_samples: 64000,
   use_cuda: True,
   data_parallel: True,
   logging_verbosity: 2,
