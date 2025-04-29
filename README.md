@@ -2,7 +2,7 @@
 
 ![DeepShape Model](DeepShape.png)
 
-bioRxiv pre-print [here] (https://www.biorxiv.org/content/10.1101/2025.04.01.646034v1)
+bioRxiv pre-print [here](https://www.biorxiv.org/content/10.1101/2025.04.01.646034v1)
 
 DeepShape is a deep convolutional neural network designed to predict molecular phenotypes from DNA sequences. Unlike traditional models that rely solely on one-hot encoded DNA sequences, DeepShape integrates DNA structural attributes indicative of local shape: minor groove width (MGW), helical twist (HelT), propeller twist (ProT), roll, and electrostatic potential (EP). This combination enhances the interpretability of the model and helps identify regulatory patterns that are not apparent from sequence information alone.
 
