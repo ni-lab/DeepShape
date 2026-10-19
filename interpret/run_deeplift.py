@@ -7,15 +7,20 @@ import sys
 import torch
 from tqdm import tqdm
 import yaml
+import argparse
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "utils"))
+from config_paths import expanded_config_text
 
 """Usage:
 run_deeplift.py /path/to/config.yaml
 """
 
 logging.basicConfig(level=logging.INFO)
-config_file = sys.argv[1]
-with open(config_file, "r") as f:
-    config = yaml.safe_load(f)
+parser = argparse.ArgumentParser(description="Compute DeepLIFT attributions for a DeepShape checkpoint.")
+parser.add_argument("config_file", type=Path)
+args = parser.parse_args()
+config = yaml.safe_load(expanded_config_text(args.config_file))
 
 def instantiate_class(object_config):
     module_path = object_config["path"]
@@ -27,7 +32,8 @@ def instantiate_class(object_config):
     return object_class(**object_config["kwargs"])
 
 # Load the model and checkpoint
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device(config.get("device", "cuda:0" if torch.cuda.is_available() else "cpu"))
+torch.set_num_threads(int(config.get("threads", 2)))
 model = instantiate_class(config["model"])
 model.to(device)
 checkpoint = torch.load(config["checkpoint"], map_location=device)
@@ -71,6 +77,10 @@ def get_random_encodings(intervals, sequence, n_seqs):
     intervals = [intervals[i] for i in idxs] 
     return encodings_from_intervals(intervals, sequence)
 n_background = config["n_background"]
+if not 2 <= n_background <= len(background_intervals):
+    raise ValueError("n_background must be between 2 and the number of background intervals.")
+if not 0 <= config["target"] < config["model"]["kwargs"]["n_targets"]:
+    raise ValueError("target must be a zero-based index into the ordered model feature list.")
 background_encodings = get_random_encodings(
     background_intervals, sequence, n_background
 )

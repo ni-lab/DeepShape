@@ -1,4 +1,4 @@
-#!/clusterfs/nilah/forest/envs/modisco_env/bin/python
+#!/usr/bin/env python
 # tf-modisco command-line tool
 # Author: Jacob Schreiber <jmschreiber91@gmail.com>, Ivy Raine <ivy.ember.raine@gmail.com>
 

@@ -1,0 +1,21 @@
+model:
+  path: ${DEEPSHAPE_ROOT}/model/deepshape_no_normalize.py
+  class: DeepShape
+  kwargs:
+    n_targets: 919
+    sequence_length: 1000
+checkpoint: ${DEEPSHAPE_ROOT}/downloads/deepshape.pth.tar
+positive_data_bed: ${DEEPSHAPE_ROOT}/examples/quickstart/positive.bed
+background_data_bed: ${DEEPSHAPE_ROOT}/examples/quickstart/background.bed
+sequence:
+  path: ${DEEPSHAPE_ROOT}/utils/genome_shape_hdf5/genomeshape_normalize.py
+  class: GenomeShape
+  kwargs:
+    input_path: ${DEEPSHAPE_ROOT}/examples/quickstart/genome.fa
+    multi_feat_file: ${DEEPSHAPE_ROOT}/examples/quickstart/shape.h5
+seed: 1337
+n_background: 4
+target: 504
+device: cpu
+threads: 2
+output_dir: ${DEEPSHAPE_OUTPUT}/interpret

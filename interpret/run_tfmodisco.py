@@ -5,18 +5,27 @@ import os
 import sys
 import time
 import yaml
+import argparse
+import subprocess
+import shlex
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "utils"))
+from config_paths import expanded_config_text
 
 def format_time(seconds):
     time_object = datetime.timedelta(seconds=seconds)
     return str(time_object)
 
 logging.basicConfig(level=logging.INFO)
-config_file = sys.argv[1]
-with open(config_file, "r") as f:
-    config = yaml.safe_load(f)
+parser = argparse.ArgumentParser(description="Discover sequence and shape motifs from DeepLIFT outputs.")
+parser.add_argument("config_file", type=Path)
+args = parser.parse_args()
+config = yaml.safe_load(expanded_config_text(args.config_file))
 
 encodings = np.load(config["encodings"])["arr_0"]
 attributions = np.load(config["attributions"])["arr_0"]
+if encodings.shape != attributions.shape or encodings.ndim != 3 or encodings.shape[1] != 9:
+    raise ValueError("Encodings and attributions must have matching shape (sequences, 9, positions).")
 output_dir = config["output_dir"]
 os.makedirs(output_dir, exist_ok=True)
 logging.info(f"Created output_dir {output_dir}.")
@@ -37,7 +46,7 @@ command = (f"modisco motifs -s '{onehot_path}' "
            "-v")
 logging.info(f"Running {command}")
 time1 = time.time()
-os.system(command)
+subprocess.run(shlex.split(command), check=True)
 runtime = format_time(time.time() - time1)
 logging.info(f"Ran TF-MoDISco for sequence features in {runtime}.")
 os.remove(onehot_path)
@@ -73,7 +82,7 @@ for feat_i, feat in enumerate(shape_feats):
                "-v")
     logging.info(f"Running {command}")
     time1 = time.time()
-    os.system(command)
+    subprocess.run(shlex.split(command), check=True)
     runtime = format_time(time.time() - time1)
     logging.info(f"Ran TF-MoDISco for {feat} in {runtime}.")
     os.remove(onehot_path)

@@ -1,19 +1,27 @@
-import click
-from selene_sdk.utils import load_path
-from selene_sdk.utils import parse_configs_and_run
+"""Run a Selene training/evaluation configuration from any working directory."""
+import argparse
+import os
+from pathlib import Path
+import tempfile
+from config_paths import expanded_config_text
 
-@click.command()
-@click.argument('config_path')
 
-def run_script(config_path):
-    configs = load_path(config_path)
-    parse_configs_and_run(configs)
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('config_path', type=Path)
+    args = parser.parse_args()
+    text = expanded_config_text(args.config_path)
+    from selene_sdk.utils import load_path, parse_configs_and_run
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as stream:
+            stream.write(text)
+            temporary = stream.name
+        configs = load_path(temporary)
+        parse_configs_and_run(configs)
+    finally:
+        if temporary:
+            os.unlink(temporary)
 
 if __name__ == '__main__':
-    run_script()
-
-# To run this script with the config_path set to /ABSOLUTE/PATH/config/train_deepshape.yml,
-# you would execute the following command in your terminal:
-
-# python run_deepshape.py /ABSOLUTE/PATH/config/train_deepshape.yml
-
+    main()

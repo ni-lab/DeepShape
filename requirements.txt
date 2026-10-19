@@ -1,0 +1,8 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.3.1+cpu; sys_platform == 'linux'
+torch==2.3.1; sys_platform != 'linux'
+numpy==1.26.4
+h5py==3.11.0
+captum==0.7.0
+PyYAML==6.0.2
+tqdm==4.66.5

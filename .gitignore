@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+downloads/
+quickstart-output/
+*.fa.fai
+*.bed.gz
+*.bed.gz.tbi
+build/

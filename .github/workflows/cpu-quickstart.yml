@@ -1,0 +1,22 @@
+name: CPU quickstart
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  offsite-example:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements-workflows.txt
+      - run: python -m pip install ./interpret/tfmodisco-lite-mod
+      - run: modisco motifs --help
+      - run: python -m unittest discover -s tests -v
+      - run: python examples/quickstart.py --train-step
+      - run: python examples/prepare_training.py
+      - run: python utils/run_deepshape.py config/train_quickstart.yml
+      - run: python interpret/run_deeplift.py config/deeplift_quickstart.yml

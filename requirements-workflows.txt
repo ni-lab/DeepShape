@@ -1,0 +1,15 @@
+-r requirements.txt
+setuptools==75.8.0
+selene-sdk==0.6.0
+pyfaidx==0.8.1.3
+pytabix==0.1
+pandas==2.2.2
+scipy==1.13.1
+scikit-learn==1.4.2
+matplotlib==3.9.2
+numba==0.60.0
+igraph==0.11.6
+leidenalg==0.10.2
+logomaker==0.8
+hdf5plugin==4.4.0
+pysam==0.22.1
