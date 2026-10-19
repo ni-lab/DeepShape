@@ -10,18 +10,35 @@ DeepShape is built upon DeeperDeepSEA, a PyTorch-based deep learning model origi
 
 ## Setup
 
-The `environment.yaml` file provided in this repository contains the dependencies required to run DeepShape. 
+From a fresh clone, run the following commands from the repository root. The environment includes Python 3.12, CPU PyTorch, and a C compiler for installing Selene and pytabix.
 
-Create the new conda environment:
 ```bash
+git clone https://github.com/ni-lab/DeepShape.git
+cd DeepShape
 conda env create -f environment.yaml
-```
-Activate the conda environment:
-```bash
 conda activate dnashapeenv
+python -m pip install ./interpret/tfmodisco-lite-mod
 ```
 
-Once the environment is activated, you will be ready to run DeepShape with all necessary dependencies installed.
+`environment.yaml` installs the dependencies in `requirements.txt`, including those for training and interpretation. Installation and the checks below were tested on Linux x86-64 with Python 3.12. For GPU training, replace CPU PyTorch with the appropriate [CUDA build](https://pytorch.org/get-started/locally/).
+
+A short CPU check runs the original model on synthetic input; it does not require genome data or a trained checkpoint:
+
+```bash
+python - <<'PYTHON'
+import torch
+from model.deepshape import DeepShape
+
+torch.set_num_threads(2)
+model = DeepShape(sequence_length=1000, n_targets=919).eval()
+with torch.no_grad():
+    predictions = model(torch.rand(2, 9, 1000))
+assert predictions.shape == (2, 919) and torch.isfinite(predictions).all()
+print("DeepShape CPU check passed:", tuple(predictions.shape))
+PYTHON
+python utils/run_deepshape.py --help
+modisco motifs --help
+```
 
 ## Running DeepShape
 
@@ -38,7 +55,9 @@ The `model` directory contains the DeepShape model implementation:
 
 ### Prepare the Configuration File
 
-Ensure your configuration file is prepared, including all necessary parameters and paths. An example is available in `config`.
+Replace `/ABSOLUTE/PATH` in `config/train_deepshape.yml` with your local paths. Required external inputs are the [hg19 FASTA](https://www.encodeproject.org/files/male.hg19/@@download/male.hg19.fasta.gz), [DNA shape HDF5](https://zenodo.org/records/13334120/files/hg19.EP_HelT_MGW_ProT_Roll.hdf5.gz) (decompress before use), and a sorted, bgzip-compressed, tabix-indexed target BED matching the 919 features in `data/distinct_features.txt`. The full target BED must be prepared separately; the single-target example in `data/README.md` is not the 919-target training dataset. The default training configuration requires a GPU.
+
+The [pretrained checkpoint](https://huggingface.co/ryankeivanfar/DeepShape/resolve/8fb6e29695b9728f45e8f97c74ca59197f9cf589/deepshape.pth.tar) and [interpretation instructions](interpret/README.md) are available separately. When running interpretation from the repository root, use `PYTHONPATH="$PWD/utils${PYTHONPATH:+:$PYTHONPATH}" python interpret/run_deeplift.py config/deeplift.yml`, after setting local paths in that configuration.
 
 ### Run the DeepShape Model
 
