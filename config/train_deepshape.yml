@@ -1,7 +1,7 @@
 ---
 ops: [ train, evaluate ]
 model: {
-  path: ${DEEPSHAPE_ROOT}/model/deepshape.py,
+  path: /ABSOLUTE/PATH/model/deepshape.py,
   class: DeepShape,
   class_args: {
     sequence_length: 1000,
@@ -11,15 +11,15 @@ model: {
 lr: 0.08
 sampler: !obj:intervals_sampler_hdf5.parallel_intervals_sampler.ParallelIntervalsSampler {
   reference_sequence: !obj:genome_shape_hdf5.make_genomeshape.GenomeShapeMaker {
-    input_path: ${DEEPSHAPE_DATA}/male.hg19.fasta,
+    input_path: /ABSOLUTE/PATH/male.hg19.fasta,
     blacklist_regions: hg19,
-    multi_feat_file: ${DEEPSHAPE_DATA}/hg19.EP_HelT_MGW_ProT_Roll.hdf5,
+    multi_feat_file: /ABSOLUTE/PATH/hg19/hg19.EP_HelT_MGW_ProT_Roll.hdf5,
   },
   features: !obj:selene_sdk.utils.load_features_list {
-    input_path: ${DEEPSHAPE_ROOT}/data/distinct_features.txt
+    input_path: /ABSOLUTE/PATH/data/distinct_features.txt
   },
-  target_path: ${DEEPSHAPE_DATA}/sorted_deepsea_data.bed.gz,
-  intervals_path: ${DEEPSHAPE_ROOT}/data/TF_intervals.txt,
+  target_path: /ABSOLUTE/PATH/sorted_deepsea_data.bed.gz,
+  intervals_path: /ABSOLUTE/PATH/data/TF_intervals.txt,
   test_holdout: [ chr8, chr9 ],
   validation_holdout: [ chr6, chr7 ],
   seed: 127,
@@ -40,6 +40,6 @@ train_model: !obj:selene_sdk.TrainModel {
   logging_verbosity: 2,
   save_checkpoint_every_n_steps: 8000
 }
-output_dir: ${DEEPSHAPE_OUTPUT}/training
+output_dir: /ABSOLUTE/PATH/OUTPUT
 random_seed: 1447
 create_subdirectory: False

@@ -203,8 +203,7 @@ class ParallelIntervalsSampler(OnlineSampler):
                  feature_thresholds=0.5,
                  mode="train",
                  save_datasets=["test"],
-                 output_dir=None,
-                 n_processes=8):
+                 output_dir=None):
         """
         Constructs a new `IntervalsSampler` object.
         """
@@ -240,9 +239,6 @@ class ParallelIntervalsSampler(OnlineSampler):
             self._update_randcache(mode=mode)
 
         self.sample_negative = sample_negative
-        self.n_processes = int(n_processes)
-        if self.n_processes < 1:
-            raise ValueError("n_processes must be positive")
 
     def _partition_dataset_proportion(self, intervals_path):
         """
@@ -480,7 +476,7 @@ class ParallelIntervalsSampler(OnlineSampler):
                                 - self._randcache[mode]["sample_next"]
        
         initargs = (lock, hyp_n_samples_drawn, n_samples_drawn, n_cache_accesses, sequences, targets, intervals, self)
-        n_procs = self.n_processes
+        n_procs = 8
         while n_samples_drawn.value < batch_size:
             with Pool(n_procs, initializer=init, initargs=initargs) as pool:
                 tup = (batch_size, cache_access_limit, mode, seq_chunk_size)

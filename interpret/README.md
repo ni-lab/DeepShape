@@ -1,37 +1,24 @@
-# Interpret DeepShape
+# Interpreting DeepShape
 
-Install `requirements-workflows.txt`, then install the included TF-MoDISco modification from the repository root:
+Pipeline that computes DeepLIFT (Shrikumar et al. 2017) attributions with respect to a trained DeepShape model's predictions, extracts motifs using TF-MoDISco (modisco-lite), and analyzes co-occurrences of a sequence and shape motif.
 
-```bash
-python -m pip install -r requirements-workflows.txt
-python -m pip install ./interpret/tfmodisco-lite-mod
+First, make sure you install the modified version of tfmodisco-lite (original: https://github.com/jmschrei/tfmodisco-lite/tree/main), which includes an option to reverse sequences without complementing in order to handle quaternized shape features, by running the following commands:
+```
+cd tfmodisco-lite-mod
+pip install .
 ```
 
-## Check DeepLIFT with the included example
+## 1. Compute DeepLIFT attributions
+Usage:
+`python -u run_deeplift.py /path/to/config/deeplift.yml`
+The config specifies a trained DeepShape model checkpoint, a set of positive sequences to compute DeepLIFT attributions for, a set of background sequences for reference, the index of the output task attributions are computed with respect to, and other parameters. See `config/deeplift.yml` for a template.
 
-```bash
-python examples/quickstart.py
-python interpret/run_deeplift.py config/deeplift_quickstart.yml
-```
+Outputs `encodings.npz`, which stores a `(n_seqs, 9, seq_len)` numpy array encoding the inputted positive sequences with the first 4 features corresponding to one-hot sequence features and the last 5 corresponding to EP, HelT, MGW, ProT, and Roll, and `attributions.npz`, which stores an array of attributions which is of the same size as `encodings.npz`. These are output to the specified output directory.
 
-The first command downloads and verifies the public checkpoint and checks pretrained CPU predictions against reference values. The second exercises the original genome-reader attribution pipeline using the miniature genome fixture.
+## 2. Run TF-MoDISco
+Usage:
+`python -u run_tfmodisco.py /path/to/config/tfmodisco.yml`
+The config specifies the paths to `attributions.npz` and `encodings.npz` output by `run_deeplift.py`, the output directory, and the maximum total number of seqlets to consider for TF-MoDISco.
 
-## Genome-scale attributions
-
-Prepare the FASTA and shape HDF5 described in `data/README.md`, set `DEEPSHAPE_DATA` and `DEEPSHAPE_OUTPUT` to absolute paths, and edit `config/deeplift.yml` to identify the positive/background BED files and zero-based target index. Then run:
-
-```bash
-python interpret/run_deeplift.py config/deeplift.yml
-```
-
-Inputs and attributions are saved as `encodings.npz` and `attributions.npz`, respectively, each with one array (`arr_0`) of shape `(sequences, 9, 1000)`. Channels are A, C, G, T, EP, HelT, MGW, ProT, Roll. The normalized genome reader must be paired with `deepshape_no_normalize.py` to avoid normalizing twice. The published feature list determines the target index; 504 is HepG2 MafK.
-
-## Sequence and shape motif discovery
-
-```bash
-python interpret/run_tfmodisco.py config/tfmodisco.yml
-```
-
-This config points to the attribution files and specifies the output directory and maximum seqlet count. Use enough biological examples for motif discovery; the tiny installation fixture does not provide a meaningful motif catalog. Shape channels are quartile-encoded and analyzed with `--nofliprc`, which reverses without complementing the encoded shape categories. A failed command stops the workflow and preserves the intermediate files for diagnosis.
-
-`analyze_cooccurrences.ipynb` is the exploratory notebook for inspecting a selected sequence–shape motif pair. Its analysis paths and selected motifs must be set for the dataset being analyzed; it is not an automatic continuation of the small installation example.
+## 3. Analyze co-occurrences of a sequence and a shape motif
+After extracting motifs with TF-MoDISco, you can analyze co-occurrences between a particular pair of sequence and shape motifs using `analyze_cooccurrences.ipynb`.

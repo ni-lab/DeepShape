@@ -1,4 +1,4 @@
-encodings: ${DEEPSHAPE_OUTPUT}/interpret/encodings.npz
-attributions: ${DEEPSHAPE_OUTPUT}/interpret/attributions.npz
-output_dir: ${DEEPSHAPE_OUTPUT}/interpret/modisco
+encodings: /ABSOLUTE/PATH/interpret/outputs/encodings.npz
+attributions: /ABSOLUTE/PATH/interpret/outputs/attributions.npz
+output_dir: /ABSOLUTE/PATH/interpret/outputs/modisco
 max_seqlets: 10000

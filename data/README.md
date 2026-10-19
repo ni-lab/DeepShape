@@ -1,35 +1,60 @@
-# Data files and model weights
+# Download and format the data
 
-## Included runnable example
+The data and formatting follow the same instructions as outlined in [Selene](https://github.com/FunctionLab/selene/blob/master/tutorials/getting_started_with_selene/getting_started_with_selene.ipynb). (The **"Shortcut"** below contains all the formatted data in a `.tar.gz`.)
 
-`examples/quickstart/` contains 16 real hg19 sequence/shape inputs derived from the supplied HepG2 MafK positive and background interval files. The fixture includes a miniature FASTA, raw shape HDF5 with its normalization statistics, pre-encoded inputs, one-track labels, and reference predictions. Its [manifest](../examples/quickstart/manifest.json) records the original coordinates, channel order, target index, source resources, and checksums. Run the commands in the main README without downloading genome-scale inputs.
+In this tutorial, we will go through a single-feature example with data from the ENCODE Uniform TFBS composite track. These are the transcription factor datasets that were used to train [Zhou and Troyanskaya's (2015) DeepSEA model](https://www.nature.com/articles/nmeth.3547).
 
-## Genome-scale resources
-
-| Resource | Location / purpose |
-| --- | --- |
-| Pretrained 919-output checkpoint | [Hugging Face](https://huggingface.co/ryankeivanfar/DeepShape) and [Zenodo](https://zenodo.org/records/13334119). The quickstart downloads a pinned revision and verifies SHA-256. |
-| Five-feature shape HDF5 | [Zenodo](https://zenodo.org/records/13334119), `hg19.EP_HelT_MGW_ProT_Roll.hdf5.gz` (about 14.5 GB compressed; allow space for decompression). |
-| hg19 sequence | [ENCODE male.hg19](https://www.encodeproject.org/files/male.hg19/@@download/male.hg19.fasta.gz). Decompress to `male.hg19.fasta`; pyfaidx creates the `.fai` index. |
-| Ordered 919-task list | Included as `data/distinct_features.txt`; preserve line order. |
-| Sampling intervals | Included as `data/TF_intervals.txt`. |
-| 919-task target labels | A coordinate-sorted, BGZF-compressed, tabix-indexed BED with columns `chrom, start, end, feature`, where every feature matches an entry in the ordered 919-task list. This large merged BED is not included in this repository; prepare it from the benchmark peak annotations before using the full training template. |
-
-`resources.json` contains exact URLs, published checksums where supplied, and the checkpoint SHA-256. Validate downloads before use. The feature order in the supplied list belongs to the published checkpoint; do not substitute an alphabetically sorted list.
-
-Example shape download:
+We can download the measurements for transcription factor CTCF in cell type GM12878 by running:
 
 ```bash
-mkdir -p data/genome
-curl -L --fail https://zenodo.org/records/13334120/files/hg19.EP_HelT_MGW_ProT_Roll.hdf5.gz -o data/genome/hg19.EP_HelT_MGW_ProT_Roll.hdf5.gz
-# Verify MD5 ff4546fc0a47f62df52949092c22d74c, then decompress:
-gunzip data/genome/hg19.EP_HelT_MGW_ProT_Roll.hdf5.gz
+wget http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeAwgTfbsUniform/wgEncodeAwgTfbsUtaGm12878CtcfUniPk.narrowPeak.gz
 ```
 
-Set `DEEPSHAPE_DATA` to the directory containing the full FASTA, uncompressed HDF5, and indexed target BED. `config/train_deepshape.yml` names the expected files.
+and format the data with:
 
-## Single-track data versus the full benchmark
+```bash
+bgzip -d wgEncodeAwgTfbsUtaGm12878CtcfUniPk.narrowPeak.gz
 
-The [Selene quickstart archive](https://zenodo.org/records/1443558/files/selene_quickstart.tar.gz) is a **single-feature CTCF tutorial**, not the full 919-task DeepShape dataset. Using that archive unchanged with a 919-output configuration produces a label/output mismatch.
+cut -f 1-3 wgEncodeAwgTfbsUtaGm12878CtcfUniPk.narrowPeak > GM12878_CTCF.bed
 
-A one-track run needs `n_targets: 1`, a one-line feature list, matching BED labels, and `sample_negative: True`. The bundled `train_quickstart.yml` demonstrates those settings with miniature-coordinate MafK data. A new single-track model is trained from initialization; it cannot load the 919-output checkpoint unchanged.
+sed -i "s/$/\tGM12878|CTCF|None/" GM12878_CTCF.bed
+
+sort -k1V -k2n -k3n GM12878_CTCF.bed > sorted_GM12878_CTCF.bed
+```
+The formatted BED file should contain 4 columns, in order: chromosome, start, end, feature. We do not support strand-specific data at this time.
+
+In this example, we will use the `ParallelIntervalsSampler` class for partitioning and sampling the data. The intervals sampler requires that we pass in an intervals file with 3 columns: chrom, start, end. This intervals file determines where in the genome we sample our data. There is a provided intervals file (`TF_intervals.txt`) with the regions in the original DeepSEA dataset that contained at least 1 transcription factor (TF).
+
+It also requires that we tabix-index the dataset BED file for fast querying of targets in genomic regions.
+
+```bash
+bgzip -c sorted_GM12878_CTCF.bed > sorted_GM12878_CTCF.bed.gz
+
+tabix -p bed sorted_GM12878_CTCF.bed.gz
+```
+The sampler classes are used to partition your dataset into training/testing/validation sets and will draw examples from the appropriate partitions during the training/evaluation process.
+
+These require that you have a file containing the distinct genomic features that the model predicts. Note that when we refer to a model's "features", we are referring to the genomic features that it predicts (i.e. they are the same as classes, labels, or targets that a deep learning model predicts).
+
+```bash
+cut -f 4 sorted_GM12878_CTCF.bed | sort -u > distinct_features.txt
+```
+Finally, we must download the hg19 FASTA file:
+```bash
+wget https://www.encodeproject.org/files/male.hg19/@@download/male.hg19.fasta.gz
+
+bgzip -d male.hg19.fasta.gz
+```
+
+## SHORTCUT: download all formatted data from Zenodo record
+
+Download the compressed data from here:
+
+```bash
+wget https://zenodo.org/record/1443558/files/selene_quickstart.tar.gz
+```
+Extract it and `mv` all files from the extracted directory `selene_quickstart_tutorial` to the current directory:
+```bash
+tar -xzvf selene_quickstart.tar.gz
+mv selene_quickstart_tutorial/* .
+```
